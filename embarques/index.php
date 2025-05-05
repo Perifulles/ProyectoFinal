@@ -266,7 +266,6 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
     function reiniciar() {
         $Manager = new Model();
         unset($_SESSION['campos']);
-        $Manager->resetconteo();
         $Manager->init();
 
         echo '<button onclick="toggleContarPersonas()" type="button" class="boton-anadir-pasante" style="background-color:#8ac926;">👥 Mostrar/Ocultar Información del barco</button>';
@@ -295,10 +294,6 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $Manager = new Model();
-
-        if (isset($_POST['cantidad'])) {
-            $Manager->conteo();
-        }
 
         if (isset($_POST['accion'])) {
             if ($_POST['accion'] === 'reiniciar') {

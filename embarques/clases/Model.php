@@ -110,7 +110,7 @@ class Model extends Conexion
 
         //Backups
         public function backupPasajeros($nombreArchivo = null){
-            $numeroLista = $_GET['lista'] ?? 6;
+            $numeroLista = $_GET['lista'] ?? 1; // valor por defecto si no se pasa nada
         
             if ($nombreArchivo === null) {
                 $nombreArchivo = "backups/backup_lista$numeroLista.sql";
@@ -338,14 +338,8 @@ class Model extends Conexion
                                 echo '</select>';}
                             elseif($row['checked'] == 2){
 
-                                $json = $this->getConteo();
-                                foreach ($json as $objeto){
-                                    foreach ($objeto as $key => $num) {
-                                        if ($row['id'] == $key) {
-                                            $value = $num;
-                                        }
-                                    }
-                                }
+                            $value = $row['subidos'];
+            
 
                                 for ($i = 0; $i <= $value - 1; $i++) {
                                     echo "<option value=\"$i\">$i</option>";
@@ -454,29 +448,6 @@ class Model extends Conexion
             echo '<p>Personas SIN check-in: <span style="background-color:rgb(255, 67, 67); font-weight: bold;">' . $sinCheck . '</span></p>';
             echo '<p><b>Total Barco: ' . $total . '</b></p>';
             echo '</div>';
-        }
-
-
-        public function resetconteo(){
-            file_put_contents('conteo.json', '');
-
-        }
-
-        public function conteo(){
-            $result = $this->getConteo();
-
-            isset($result) ? $conteo = $result : $conteo = [];
-
-            $conteo[] = [$_POST['Checkid'] => $_POST['cantidad']];
-            $jsonmode = json_encode($conteo, false);
-            file_put_contents('conteo.json', $jsonmode);
-        }
-
-        public function getConteo(){
-            $content = file_get_contents('conteo.json');
-            $conteo = json_decode($content, false);
-            $conteo = isset($conteo) ? $conteo : [];
-            return $conteo;
         }
 
     // Contar personas en el barco
