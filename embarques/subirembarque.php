@@ -140,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
   <form class="formulario" action="" method="POST" enctype="multipart/form-data">
-    <h1>Subir lista de reservas</h1>
+    <h1>Subir Lista de Reservas</h1>
     <input type="file" name="excel" accept=".xls,.xlsx" required><br>
     <button type="submit">Subir Excel</button>
   </form>
