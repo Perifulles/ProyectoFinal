@@ -164,7 +164,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 </head>
 
 <body>
-<button onclick="toggleCampos()" type="button" class="boton-anadir-pasante">🎛️ Mostrar/Ocultar Campos</button>
+<button onclick="toggleCampos()" type="button" class="boton-anadir-pasante">Mostrar/Ocultar Campos</button>
 
 <div id="camposContainer" style="margin-top: 20px;">
     <form method="POST" style="margin-bottom: 20px;">
@@ -233,7 +233,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
                 ?>
             </div>
             <br>
-            <button type="submit" name="accion" value="reiniciar" class="botonform"><b>Iniciar/Reiniciar ⚠️</b></button>
+            <button type="submit" name="accion" value="reiniciar" class="botonform"><b>Iniciar/Reiniciar</b></button>
             <button type="submit" name="accion" value="nuevosCampos" class="botonform"><b>Mostrar</b></button>
         </fieldset>
     </form>
@@ -268,7 +268,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
         unset($_SESSION['campos']);
         $Manager->init();
 
-        echo '<button onclick="toggleContarPersonas()" type="button" class="boton-anadir-pasante" style="background-color:#8ac926;">👥 Mostrar/Ocultar Información del barco</button>';
+        echo '<button onclick="toggleContarPersonas()" type="button" class="boton-anadir-pasante" style="background-color:#8ac926;">Mostrar/Ocultar Información Del Barco</button>';
         echo '<div id="contarPersonasContainer" style="display:none;">';
         $Manager->showContarPersonas();
         echo '</div>';
@@ -280,7 +280,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
     function nuevosCampos() {
         $Manager = new Model();
 
-        echo '<button onclick="toggleContarPersonas()" type="button" class="boton-anadir-pasante" style="background-color:#8ac926;">👥 Mostrar/Ocultar Información del barco</button>';
+        echo '<button onclick="toggleContarPersonas()" type="button" class="boton-anadir-pasante" style="background-color:#8ac926;">Mostrar/Ocultar Información Del Barco</button>';
         echo '<div id="contarPersonasContainer" style="display:none;">';
         $Manager->showContarPersonas();
         echo '</div>';
@@ -343,7 +343,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
             <button class="boton-anadir-pasante">➕ Añadir Pasante</button>
         </a>
         <a href="index.php">
-            <button class="boton-anadir-pasante" style="background-color: #1982c4;">🏠 Volver al Inicio</button>
+            <button class="boton-anadir-pasante" style="background-color: #0066cc ;">🏠 Volver al Inicio</button>
         </a>
         <a href="?lista=<?= $lista ?>&accion=restaurar" onclick="return confirm('¿Estás seguro de que quieres restaurar el backup de esta lista?')">
             <button class="boton-anadir-pasante" style="background-color: #ff595e;">♻️ Restaurar Backup</button>
