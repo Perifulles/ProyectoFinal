@@ -233,7 +233,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
                 ?>
             </div>
             <br>
-            <button type="submit" name="accion" value="reiniciar" class="botonform"><b>Iniciar/Reiniciar</b></button>
+            <button type="submit" name="accion" value="reiniciar" class="botonform"><b>Iniciar/Reiniciar ⚠️</b></button>
             <button type="submit" name="accion" value="nuevosCampos" class="botonform"><b>Mostrar</b></button>
         </fieldset>
     </form>

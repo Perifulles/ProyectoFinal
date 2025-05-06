@@ -70,7 +70,7 @@
 </head>
 <body>
     <h2>Añadir nuevo pasante</h2>
-    <form action="index.php?lista=1" method="POST">
+    <form action="embarques.php?lista=1" method="POST">
         <input type="hidden" name="accion" value="insertarPasante">
         
         <label>Nombre:</label>
