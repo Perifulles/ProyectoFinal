@@ -300,7 +300,7 @@ class Model extends Conexion
                                 if ($cantidad == 0) {
                                 echo "<td></td>";
                                 }else{
-                                $imgSrc = "IMG/{$campo}.png";  // nombres deben coincidir
+                                $imgSrc = "../IMG/{$campo}.png";  // nombres deben coincidir
                                 $htmlImg = '';
                                 
                                 $htmlImg .= "<img src='$imgSrc' alt='$campo' style='height: 24px; margin-right: 2px;'>";
@@ -311,7 +311,7 @@ class Model extends Conexion
                                 if ($cantidad == 0) {
                                     echo "<td></td>";
                                     }else{
-                                $imgSrc = "IMG/grat.png";  // nombres deben coincidir
+                                $imgSrc = "../IMG/grat.png";  // nombres deben coincidir
                                 $htmlImg = '';
                                 $htmlImg .= "<img src='$imgSrc' alt='$campo' style='height: 24px; margin-right: 2px;'>";
                                 echo "<td>$htmlImg x $cantidad</td>";

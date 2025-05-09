@@ -150,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <?php endif; ?>
 
   <a href="embarques.php" class="boton-flecha">Pasar con el último embarque →</a>
-  <a href="index.php" class="boton-volver">← Volver</a>
+  <a href="../index.php" class="boton-volver">← Volver</a>
 
 </body>
 </html>
