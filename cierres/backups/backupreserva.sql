@@ -1,12 +1,7 @@
-INSERT INTO pasajeros (id_cliente, nombre, apellido1, apellido2, email, telefono) VALUES ('260642', 'Natalia', 'Gómez', 'Torres', 'natalia.gomez@example.com', '677901234');
-INSERT INTO pasajeros (id_cliente, nombre, apellido1, apellido2, email, telefono) VALUES ('261155', 'Lucía', 'Torres', 'Pérez', 'lucia.torres@example.com', '656789012');
-INSERT INTO pasajeros (id_cliente, nombre, apellido1, apellido2, email, telefono) VALUES ('265831', 'Noelia', 'León', 'Gómez', 'noelia.leon@example.com', '677901236');
-INSERT INTO pasajeros (id_cliente, nombre, apellido1, apellido2, email, telefono) VALUES ('266062', 'Laura', 'Martínez', 'Gómez', 'laura.martinez@example.com', '612345678');
 INSERT INTO pasajeros (id_cliente, nombre, apellido1, apellido2, email, telefono) VALUES ('266063', 'Pablo', 'Rodríguez', 'Sánchez', 'pablo.rodriguez@example.com', '623456789');
 INSERT INTO pasajeros (id_cliente, nombre, apellido1, apellido2, email, telefono) VALUES ('266064', 'Carmen', 'López', 'Fernández', 'carmen.lopez@example.com', '634567890');
 INSERT INTO pasajeros (id_cliente, nombre, apellido1, apellido2, email, telefono) VALUES ('266065', 'Javier', 'García', 'Moreno', 'javier.garcia@example.com', '645678901');
 INSERT INTO pasajeros (id_cliente, nombre, apellido1, apellido2, email, telefono) VALUES ('266069', 'Andrés', 'Ruiz', 'Martínez', 'andres.ruiz@example.com', '667890123');
-INSERT INTO pasajeros (id_cliente, nombre, apellido1, apellido2, email, telefono) VALUES ('266070', 'Sara', 'Herrera', 'Jiménez', 'sara.herrera@example.com', '678901234');
 INSERT INTO pasajeros (id_cliente, nombre, apellido1, apellido2, email, telefono) VALUES ('266071', 'Álvaro', 'Morales', 'Castro', 'alvaro.morales@example.com', '689012345');
 INSERT INTO pasajeros (id_cliente, nombre, apellido1, apellido2, email, telefono) VALUES ('266072', 'Beatriz', 'Vargas', 'Delgado', 'beatriz.vargas@example.com', '690123456');
 INSERT INTO pasajeros (id_cliente, nombre, apellido1, apellido2, email, telefono) VALUES ('266073', 'David', 'Navarro', 'Ortega', 'david.navarro@example.com', '601234567');
@@ -42,7 +37,3 @@ INSERT INTO pasajeros (id_cliente, nombre, apellido1, apellido2, email, telefono
 INSERT INTO pasajeros (id_cliente, nombre, apellido1, apellido2, email, telefono) VALUES ('266119', 'Mateo', 'Torres', 'Ramos', 'mateo.torres@example.com', '622456782');
 INSERT INTO pasajeros (id_cliente, nombre, apellido1, apellido2, email, telefono) VALUES ('266120', 'Celia', 'Romero', 'Bravo', 'celia.romero@example.com', '633567893');
 INSERT INTO pasajeros (id_cliente, nombre, apellido1, apellido2, email, telefono) VALUES ('266121', 'Joaquín', 'Morales', 'Molina', 'joaquin.morales@example.com', '644678904');
-INSERT INTO pasajeros (id_cliente, nombre, apellido1, apellido2, email, telefono) VALUES ('266122', 'Alicia', 'Navarro', 'Sánchez', 'alicia.navarro@example.com', '655789015');
-INSERT INTO pasajeros (id_cliente, nombre, apellido1, apellido2, email, telefono) VALUES ('266125', 'Mario', 'Gil', 'Cano', 'mario.gil@example.com', '666890126');
-INSERT INTO pasajeros (id_cliente, nombre, apellido1, apellido2, email, telefono) VALUES ('266126', 'Eva', 'Rodríguez', 'León', 'eva.rodriguez@example.com', '677901237');
-INSERT INTO pasajeros (id_cliente, nombre, apellido1, apellido2, email, telefono) VALUES ('266127', 'Samantha', 'Pérez', 'Sánchez', 'samdssd@gmail.com', '+34 637276216');

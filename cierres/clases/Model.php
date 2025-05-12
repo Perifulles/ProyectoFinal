@@ -246,51 +246,65 @@ class Model extends ConexionCierre
     }
     
     
-    public function backupCierre(){
-        $nombreArchivo = "backups/backupreserva.sql";
-    
-        $datos = $this->getClientes();
-        if (empty($datos)) return;
-    
-        $sql = "";
-        foreach ($datos as $fila) {
-            $columnas = array_keys($fila);
-            $valores = array_map(function ($valor) {
-                return is_null($valor) ? 'NULL' : "'" . addslashes($valor) . "'";
-            }, array_values($fila));
-    
-            $sql .= "INSERT INTO pasajeros (" . implode(", ", $columnas) . ") VALUES (" . implode(", ", $valores) . ");\n";
-        }
+    public function backupCierre() {
+        $tablas = [
+            'clientes' => $this->getClientes(),
+            'reservas' => $this->getReservas()
+        ];
     
         if (!is_dir('backups')) {
             mkdir('backups', 0777, true);
         }
     
-        file_put_contents($nombreArchivo, $sql);
-    }
+        foreach ($tablas as $nombreTabla => $datos) {
+            $sql = "";
+            foreach ($datos as $fila) {
+                $columnas = array_keys($fila);
+                $valores = array_map(function ($valor) {
+                    return is_null($valor) ? 'NULL' : "'" . addslashes($valor) . "'";
+                }, array_values($fila));
     
-    
-    public function restoreBackup(){
-        $nombreArchivo = "backups/backupreserva.sql";
-    
-        if (!file_exists($nombreArchivo)) {
-            throw new Exception("No se encontró el archivo de backup.");
-        }
-    
-        $this->deleteList(); // Borrar datos actuales
-        $sql = file_get_contents($nombreArchivo);
-        if ($sql) {
-            $sentencias = explode(";", $sql);
-            foreach ($sentencias as $sentencia) {
-                $sentencia = trim($sentencia);
-                if (!empty($sentencia)) {
-                    $this->getConn()->exec($sentencia . ";");
-                }
+                $sql .= "INSERT INTO $nombreTabla (" . implode(", ", $columnas) . ") VALUES (" . implode(", ", $valores) . ");\n";
             }
-        } else {
-            throw new Exception("Error al leer el archivo de backup.");
+    
+            $nombreArchivo = "backups/backup{$nombreTabla}.sql";
+            file_put_contents($nombreArchivo, $sql);
         }
     }
+    
+    public function restoreBackup() {
+        // Orden correcto: primero reservas (hija), luego clientes (padre)
+        $tablas = ['reservas', 'clientes'];
+    
+        // Eliminar datos actuales
+        foreach ($tablas as $tabla) {
+            $this->getConn()->exec("DELETE FROM $tabla;");
+        }
+    
+        // Restaurar backups en orden inverso: primero clientes, luego reservas
+        $tablasRestaurar = ['clientes', 'reservas'];
+        foreach ($tablasRestaurar as $tabla) {
+            $nombreArchivo = "backups/backup{$tabla}.sql";
+            if (!file_exists($nombreArchivo)) {
+                throw new Exception("No se encontró el archivo de backup: $nombreArchivo");
+            }
+    
+            $sql = file_get_contents($nombreArchivo);
+            if ($sql) {
+                $sentencias = explode(";", $sql);
+                foreach ($sentencias as $sentencia) {
+                    $sentencia = trim($sentencia);
+                    if (!empty($sentencia)) {
+                        $this->getConn()->exec($sentencia . ";");
+                    }
+                }
+            } else {
+                throw new Exception("Error al leer el archivo de backup: $nombreArchivo");
+            }
+        }
+    }
+    
+    
 
     public function getReservaPorId($id)
     {
