@@ -148,10 +148,23 @@ class Model extends ConexionCierre
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function showCierre($camposSeleccionados = [])
+    public function showCierre($camposSeleccionados = [], $filtrosOrigen = [], $filtrosUsuario = [])
     {
         $clientes = $this->getClientes();
         $reservas = $this->getReservas();
+    
+        // Aplicar filtros si hay alguno
+        if (!empty($filtrosOrigen)) {
+            $reservas = array_filter($reservas, function ($reserva) use ($filtrosOrigen) {
+                return in_array($reserva['origen'], $filtrosOrigen);
+            });
+        }
+    
+        if (!empty($filtrosUsuario)) {
+            $reservas = array_filter($reservas, function ($reserva) use ($filtrosUsuario) {
+                return in_array($reserva['usuario'], $filtrosUsuario);
+            });
+        }
     
         // Definir todos los posibles campos
         $todosCampos = [
@@ -213,17 +226,19 @@ class Model extends ConexionCierre
                     <input type="submit" class="bononcheck" name="Modificar" value="Modificar">
                     </form>
                   </td>';
-                  echo '<td style="text-align: center;">
+            echo '<td style="text-align: center;">
                     <form action="eliminar.php" method="POST" onsubmit="return confirm(\'¿Estás seguro de que quieres eliminar esta reserva?\');">
                       <input type="hidden" name="id_reserva" value="' . $reserva['id_reserva'] . '">
                       <input type="submit" class="bononcheck" name="Eliminar" value="Eliminar" style="background-color: #ff4d4d;">
                     </form>
-                    </td>';
+                  </td>';
             echo '</tr>';
         }
     
         echo '</tbody></table>';
     }
+    
+
 
     public function showTotales()
     {

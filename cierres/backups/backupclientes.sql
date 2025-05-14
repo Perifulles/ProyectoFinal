@@ -1,3 +1,6 @@
+INSERT INTO clientes (id_cliente, nombre, apellido1, apellido2, email, telefono) VALUES ('260642', 'Natalia', 'Gómez', 'Torres', 'natalia.gomez@example.com', '677901234');
+INSERT INTO clientes (id_cliente, nombre, apellido1, apellido2, email, telefono) VALUES ('261155', 'Lucía', 'Torres', 'Pérez', 'lucia.torres@example.com', '656789012');
+INSERT INTO clientes (id_cliente, nombre, apellido1, apellido2, email, telefono) VALUES ('265831', 'Noelia', 'León', 'Gómez', 'noelia.leon@example.com', '677901236');
 INSERT INTO clientes (id_cliente, nombre, apellido1, apellido2, email, telefono) VALUES ('266062', 'Laura', 'Martínez', 'Gómez', 'laura.martinez@example.com', '612345678');
 INSERT INTO clientes (id_cliente, nombre, apellido1, apellido2, email, telefono) VALUES ('266063', 'Pablo', 'Rodríguez', 'Sánchez', 'pablo.rodriguez@example.com', '623456789');
 INSERT INTO clientes (id_cliente, nombre, apellido1, apellido2, email, telefono) VALUES ('266064', 'Carmen', 'López', 'Fernández', 'carmen.lopez@example.com', '634567890');

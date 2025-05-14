@@ -42,9 +42,34 @@ $porDefecto = [
     'telefono', 'comentario', 'estado', 'importe', 'visa', 'efectivo'
 ];
 
+// Opciones disponibles
+$filtrosOrigen = [
+    'Web' => 'Web',
+    'Planning' => 'Planning',
+];
+
+// Selecciones del usuario (solo valores: Web, Planning...)
+$filtrosOrigenSeleccionados = $_POST['origen'] ?? ($_SESSION['filtros_origen_seleccionados'] ?? array_values($filtrosOrigen));
+
+
+// Opciones disponibles
+$filtrosUsuario = [
+    'Hermi' => 'hermi@suaventura.com',
+    'Agencia' => 'agencia@suaventura.com',
+    'Reservas' => 'reservas@balneario.com',
+    'Embarcadero' => 'embarcaderos@suaventura.com',
+    'Anónimo' => 'Anonimo',
+    'InfoCofrentes' => 'info@cofrentesturismoactivo.com'
+];
+
+// Selecciones del usuario (solo valores: los correos o "Anonimo")
+$filtrosUsuarioSeleccionados = $_POST['usuario'] ?? ($_SESSION['filtros_usuario_seleccionados'] ?? array_values($filtrosUsuario));
+
+
 // Inicializar variables para determinar qué mostrar y qué campos usar
 $mostrarResultados = false;
 $camposSeleccionados = $porDefecto; // Valor inicial por defecto
+$filtrosSeleccionados = []; // Inicializar filtros seleccionados
 
 // --- Manejo de Acciones (POST/GET) y determinación de $camposSeleccionados ---
 
@@ -64,45 +89,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['
 }
 
 // 2. Determinar $camposSeleccionados y manejar otras acciones POST
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion'])) {
-    $accion = $_POST['accion'];
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion'])) {
+        $accion = $_POST['accion'];
 
-    if ($accion === 'reiniciar') {
-        $Manager->init(); // Llama a la inicialización del Manager
-        unset($_SESSION['campos_cierre']); // Elimina la preferencia guardada
-        $camposSeleccionados = $porDefecto; // Usa los campos por defecto para esta petición
-        $mostrarResultados = true; // Muestra los resultados después de reiniciar
-    } elseif ($accion === 'mostrar') {
-        $camposSeleccionados = $_POST['campos'] ?? $porDefecto; // Toma los campos del form o usa defecto
-        $_SESSION['campos_cierre'] = $camposSeleccionados; // Guarda la selección en la sesión
-        $mostrarResultados = true; // Muestra los resultados
+        if ($accion === 'reiniciar') {
+            $Manager->init();
+        
+            // Establecer campos por defecto
+            $camposSeleccionados = $porDefecto;
+            $_SESSION['campos_cierre'] = $camposSeleccionados;
+        
+            // Restaurar también los filtros a todos los disponibles
+            $_SESSION['filtros_origen_seleccionados'] = array_values($filtrosOrigen);
+            $_SESSION['filtros_usuario_seleccionados'] = array_values($filtrosUsuario);
+        
+            $filtrosOrigenSeleccionados = $_SESSION['filtros_origen_seleccionados'];
+            $filtrosUsuarioSeleccionados = $_SESSION['filtros_usuario_seleccionados'];
+        
+            $mostrarResultados = true;
+        }
+        elseif ($accion === 'mostrar') {
+            // Obtener campos seleccionados del formulario
+            $camposSeleccionados = $_POST['campos'] ?? $_SESSION['campos_cierre'] ?? $porDefecto; // Si no hay campos seleccionados, usar por defecto
+            $_SESSION['campos_cierre'] = $camposSeleccionados; // Guardar en sesión
+
+            // Guardar filtros seleccionados en sesión
+            $_SESSION['filtros_origen_seleccionados'] = $filtrosOrigenSeleccionados;
+            $_SESSION['filtros_usuario_seleccionados'] = $filtrosUsuarioSeleccionados;
+
+            $mostrarResultados = true; // Muestra los resultados
+        }
+        elseif ($accion === 'exportar') {
+            // Exportar a Excel
+            $Manager->exportToExcel($camposSeleccionados, $filtrosOrigenSeleccionados, $filtrosUsuarioSeleccionados);
+        }  
+        
     }
-    // Nota: Si hubiera otras acciones POST que no sean 'restaurar', se manejarían aquí.
-    // Si no es 'reiniciar' ni 'mostrar', podría cargar desde sesión o usar defecto.
-    // Pero como solo hay 'reiniciar' y 'mostrar' que afecten $camposSeleccionados directamente,
-    // no necesitamos un 'else' complejo aquí para determinar $camposSeleccionados.
-    // Si la acción POST no fue reconocida explícitamente aquí, $camposSeleccionados
-    // se determinará por la lógica GET/Sesión más abajo.
 
-}
 // 3. Manejar caso GET 'modificar'
-elseif (isset($_GET['desde']) && $_GET['desde'] === 'modificar') {
-    $camposSeleccionados = $porDefecto; // Forzar campos por defecto
-    $_SESSION['campos_cierre'] = $camposSeleccionados; // Guardar este estado por si acaso
-    $mostrarResultados = true; // Muestra los resultados en modo modificar
-}
+    elseif (isset($_GET['desde']) && $_GET['desde'] === 'modificar') {
+        $camposSeleccionados = $porDefecto; // Forzar campos por defecto
+        $_SESSION['campos_cierre'] = $camposSeleccionados; // Guardar este estado por si acaso
+        $mostrarResultados = true; // Muestra los resultados en modo modificar
+    }
 // 4. Caso por defecto (GET normal, carga inicial o POST sin acción reconocida arriba)
-else {
-    // Carga los campos desde la sesión si existen, si no, usa los por defecto
-    $camposSeleccionados = $_SESSION['campos_cierre'] ?? $porDefecto;
-    // No se establece $mostrarResultados = true aquí, solo se muestran al cargar si hay acción previa
-}
+    else {
+        // Carga los campos desde la sesión si existen, si no, usa los por defecto
+        $camposSeleccionados = $_SESSION['campos_cierre'] ?? $porDefecto;
+        // No se establece $mostrarResultados = true aquí, solo se muestran al cargar si hay acción previa
+    }
 
 // Si viene de restaurar backup, mostrar cierre automáticamente
-if (isset($_SESSION['mostrar_cierre_post_restore']) && $_SESSION['mostrar_cierre_post_restore'] === true) {
-    $mostrarResultados = true;
-    unset($_SESSION['mostrar_cierre_post_restore']); // Limpia la bandera
-}
+    if (isset($_SESSION['mostrar_cierre_post_restore']) && $_SESSION['mostrar_cierre_post_restore'] === true) {
+        $mostrarResultados = true;
+        unset($_SESSION['mostrar_cierre_post_restore']); // Limpia la bandera
+    }
 
 
 // --- FIN DE LÓGICA UNIFICADA ---
@@ -123,6 +164,48 @@ if (isset($_SESSION['mensaje_backup'])) {
     unset($_SESSION['mensaje_backup']);
 }
 ?>
+<button onclick="toggleFiltros()" type="button" class="boton-anadir-pasante" style="background-color: #FFD700;">🎚️ Mostrar/Ocultar Filtros</button>
+
+<div id="filtrosContainer" style="margin-top: 20px; display: none;">
+    <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" style="margin-bottom: 20px;">
+    <fieldset>
+    <legend style="font-weight: bold; font-size: x-large;">Selecciona los filtros:</legend>
+    <br>
+        
+    <!-- Campo Origen -->
+    <label style="font-size: 1.2em; font-weight: bold; margin-bottom: 20px; margin-top: 20px;">Origen:</label>
+    <div class="checkbox-group">
+        <?php
+        foreach ($filtrosOrigen as $etiqueta => $valor) {
+            $checked = in_array($valor, $filtrosOrigenSeleccionados) ? 'checked' : '';
+            echo "<label style='display: inline-block; min-width: 160px; font-size: 1.1em; margin: 5px 5px;'>
+                    <input type='checkbox' name='origen[]' value='$valor' $checked> $etiqueta
+                </label>";
+        }
+        ?>
+    </div>
+
+    <br>
+
+    <!-- Campo Usuario -->
+    <label style="font-size: 1.2em; font-weight: bold;">Usuario:</label>
+    <div class="checkbox-group">
+        <?php
+        foreach ($filtrosUsuario as $etiqueta => $correo) {
+            $checked = in_array($correo, $filtrosUsuarioSeleccionados) ? 'checked' : '';
+            echo "<label style='display: inline-block; min-width: 160px; font-size: 1.1em; margin: 5px 5px;'>
+                    <input type='checkbox' name='usuario[]' value='$correo' $checked> $etiqueta
+                </label>";
+        }
+        ?>
+    </div>
+
+
+    <br>
+    <button type="submit" name="accion" value="mostrar" class="botonform"><b>Aplicar Filtros</b></button>
+    </fieldset>
+    </form>
+</div>
 
 <button onclick="toggleCampos()" type="button" class="boton-anadir-pasante">🎛️ Mostrar/Ocultar Campos</button>
 
@@ -165,6 +248,11 @@ if (isset($_SESSION['mensaje_backup'])) {
         container.style.display = container.style.display === 'none' ? 'block' : 'none';
     }
 
+    function toggleFiltros() {
+        const container = document.getElementById('filtrosContainer');
+        container.style.display = container.style.display === 'none' ? 'block' : 'none';
+    }
+
     function toggleTotales() {
         const container = document.getElementById('totalesBox'); // Asegúrate que el div de totales tenga id="totalesBox"
         if (container) {
@@ -184,7 +272,8 @@ if ($mostrarResultados) {
 
     // Muestra la tabla de cierre con los campos seleccionados apropiados
     // $camposSeleccionados ya tiene el valor correcto según la acción realizada (o sesión/default)
-    $Manager->showCierre($camposSeleccionados);
+    $Manager->showCierre($camposSeleccionados, $filtrosOrigenSeleccionados, $filtrosUsuarioSeleccionados);
+
 }
 // --- FIN SECCIÓN PARA MOSTRAR RESULTADOS ---
 ?>
