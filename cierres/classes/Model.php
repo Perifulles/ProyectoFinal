@@ -1,10 +1,72 @@
 <?php
+require_once __DIR__ . '/ConexionCierre.php'; // Ajusta la ruta según donde esté
+
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 
 class Model extends ConexionCierre
 {
+
+    public function exportToExcel($filtrosOrigen, $filtrosUsuario)
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+    
+        // Encabezados
+        $headers = ['ID', 'CREACIÓN', 'F.ENTRADA', 'PRODUCTO', 'HORA', 'OCUPACION', 'NOMBRE', 'APELLIDO1', 'APELLIDO2', 'ESTADO', 'IMPORTE', 'VISA', 'EFECTIVO'];
+        $sheet->fromArray($headers, null, 'A1');
+    
+        // Construir consulta con filtros
+        $placeholdersOrigen = implode(',', array_fill(0, count($filtrosOrigen), '?'));
+        $placeholdersUsuario = implode(',', array_fill(0, count($filtrosUsuario), '?'));
+    
+        $sql = "
+            SELECT
+                r.id_reserva AS ID,
+                r.fecha_creacion AS CREACIÓN,
+                r.fecha_entrada AS `F.ENTRADA`,
+                r.producto AS PRODUCTO,
+                r.hora AS HORA,
+                r.ocupacion AS OCUPACION,
+                c.nombre AS NOMBRE,
+                c.apellido1 AS APELLIDO1,
+                c.apellido2 AS APELLIDO2,
+                r.estado AS ESTADO,
+                r.importe AS IMPORTE,
+                r.visa AS VISA,
+                r.efectivo AS EFECTIVO
+            FROM reservas r
+            LEFT JOIN clientes c ON r.id_cliente = c.id_cliente
+            WHERE r.origen IN ($placeholdersOrigen)
+            AND r.usuario IN ($placeholdersUsuario)
+        ";
+    
+        $stmt = $this->GetConn()->prepare($sql);
+        $stmt->execute(array_merge($filtrosOrigen, $filtrosUsuario));
+        $datos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+        // Rellenar filas
+        $row = 2;
+        foreach ($datos as $fila) {
+            $sheet->fromArray(array_values($fila), null, 'A' . $row);
+            $row++;
+        }
+    
+        // Descargar Excel
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="export_reservas.xlsx"');
+        header('Cache-Control: max-age=0');
+    
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+    
+
+
 
     // This function is used to import data from an Excel file into the database
     public function import()
@@ -115,6 +177,7 @@ class Model extends ConexionCierre
         $date = date_create($excelDate);
         return $date ? $date->format('Y-m-d H:i:s') : null;
     }
+
     public function deleteList()
     {
         $query = 'DELETE FROM reservas';
@@ -154,17 +217,20 @@ class Model extends ConexionCierre
         $reservas = $this->getReservas();
     
         // Aplicar filtros si hay alguno
-        if (!empty($filtrosOrigen)) {
+        if(!empty($filtrosOrigen)) {
             $reservas = array_filter($reservas, function ($reserva) use ($filtrosOrigen) {
                 return in_array($reserva['origen'], $filtrosOrigen);
             });
         }
     
-        if (!empty($filtrosUsuario)) {
+
+        // Aplicar el filtro solo si hay alguno seleccionado Y no están todos seleccionados
+        if (!empty($filtrosUsuario) && count($filtrosUsuario) < 6) {
             $reservas = array_filter($reservas, function ($reserva) use ($filtrosUsuario) {
                 return in_array($reserva['usuario'], $filtrosUsuario);
             });
         }
+        
     
         // Definir todos los posibles campos
         $todosCampos = [
@@ -240,13 +306,25 @@ class Model extends ConexionCierre
     
 
 
-    public function showTotales()
+    public function showTotales(array $filtrosOrigen = [], array $filtrosUsuario = [])
     {
+        // Obtener todas las reservas
         $reservas = $this->getReservas();
+    
         $totalVisa = 0;
         $totalEfectivo = 0;
     
         foreach ($reservas as $reserva) {
+            // Aplicar filtro de origen (si hay)
+            if (!empty($filtrosOrigen) && !in_array($reserva['origen'], $filtrosOrigen)) {
+                continue;
+            }
+    
+            // Aplicar filtro de usuario solo si hay alguno y hay menos de 6 seleccionados
+            if (!empty($filtrosUsuario) && count($filtrosUsuario) < 6 && !in_array($reserva['usuario'], $filtrosUsuario)) {
+                continue;
+            }
+    
             $totalVisa += floatval($reserva['visa']);
             $totalEfectivo += floatval($reserva['efectivo']);
         }
@@ -259,6 +337,8 @@ class Model extends ConexionCierre
         </div>
         ';
     }
+    
+    
     
     
     public function backupCierre() {
@@ -362,3 +442,4 @@ class Model extends ConexionCierre
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();}
 }
+?>

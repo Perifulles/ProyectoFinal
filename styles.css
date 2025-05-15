@@ -151,12 +151,11 @@ select{
 }
 
 
-
 .totales-box {
     position: fixed; /* Fija el elemento en la pantalla */
-    bottom: 10px; /* Más cerca de la parte inferior */
-    left: 50%; /* Centra horizontalmente */
-    transform: translateX(-50%); /* Ajusta el centrado */
+    top: 10px; /* Pegado a la parte superior */
+    right: 10px; /* Pegado a la derecha */
+    transform: none; /* Elimina el centrado horizontal */
     z-index: 1000; /* Asegura que esté por encima de otros elementos */
     background-color: #ffffff; /* Fondo blanco para que sea visible */
     padding: 30px 40px; /* Espaciado interno aumentado */

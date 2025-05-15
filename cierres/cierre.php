@@ -1,7 +1,7 @@
 <?php
 session_start();
 require_once __DIR__ . '/vendor/autoload.php';
-require 'autoloader.php'; // Asegúrate que la clase Model está incluida aquí
+require_once __DIR__ . '/classes/Model.php';  // Carga manual de la clase Model
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -120,9 +120,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['
             $mostrarResultados = true; // Muestra los resultados
         }
         elseif ($accion === 'exportar') {
-            // Exportar a Excel
-            $Manager->exportToExcel($camposSeleccionados, $filtrosOrigenSeleccionados, $filtrosUsuarioSeleccionados);
-        }  
+            $camposSeleccionados = $_POST['campos'] ?? $_SESSION['campos_cierre'] ?? $porDefecto;
+            $Manager->exportToExcel($filtrosOrigenSeleccionados, $filtrosUsuarioSeleccionados);
+        }
+        
         
     }
 
@@ -148,8 +149,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['
 
 // --- FIN DE LÓGICA UNIFICADA ---
 
-?>
-<html>
+?><html>
 <head>
     <meta charset="UTF-8">
     <title>Cierre de Reservas</title>
@@ -164,8 +164,7 @@ if (isset($_SESSION['mensaje_backup'])) {
     unset($_SESSION['mensaje_backup']);
 }
 ?>
-<button onclick="toggleFiltros()" type="button" class="boton-anadir-pasante" style="background-color: #FFD700;">🎚️ Mostrar/Ocultar Filtros</button>
-
+<button onclick="toggleFiltros()" type="button" class="boton-anadir-pasante" style="background-color: #FFD700; display: block;">🎚️ Mostrar/Ocultar Filtros</button>
 <div id="filtrosContainer" style="margin-top: 20px; display: none;">
     <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" style="margin-bottom: 20px;">
     <fieldset>
@@ -268,7 +267,7 @@ if ($mostrarResultados) {
     echo '<button onclick="toggleTotales()" type="button" class="boton-anadir-pasante" style="background-color:#8ac926;">🧮 Mostrar/Ocular Totales</button>';
 
     // Muestra los totales (asumiendo que showTotales() genera el HTML necesario, incluyendo el div con id="totalesBox")
-    $Manager->showTotales();
+    $Manager->showTotales( $filtrosOrigenSeleccionados, $filtrosUsuarioSeleccionados);
 
     // Muestra la tabla de cierre con los campos seleccionados apropiados
     // $camposSeleccionados ya tiene el valor correcto según la acción realizada (o sesión/default)
@@ -277,15 +276,21 @@ if ($mostrarResultados) {
 }
 // --- FIN SECCIÓN PARA MOSTRAR RESULTADOS ---
 ?>
-
 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px;">
     <a href="../index.php">
         <button class="boton-anadir-pasante" style="background-color: #0066cc;">🏠 Volver al Inicio</button>
     </a>
+
+    <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" onsubmit="return confirm('¿Estás seguro de que quieres exportar el cierre a Excel?')">
+        <button type="submit" name="accion" value="exportar" class="boton-anadir-pasante" style="background-color: #00b894;">📤 Exportar a Excel</button>
+    </form>
+
     <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" onsubmit="return confirm('¿Estás seguro de que quieres restaurar el backup del cierre?')">
         <button type="submit" name="accion" value="restaurar" class="boton-anadir-pasante" style="background-color: #ff595e;">♻️ Restaurar Backup</button>
     </form>
 </div>
+
+
 
 </body>
 </html>
