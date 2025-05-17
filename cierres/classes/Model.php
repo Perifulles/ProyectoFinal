@@ -40,8 +40,8 @@ class Model extends ConexionCierre
                 r.efectivo AS EFECTIVO
             FROM reservas r
             LEFT JOIN clientes c ON r.id_cliente = c.id_cliente
-            WHERE r.origen IN ($placeholdersOrigen)
-            AND r.usuario IN ($placeholdersUsuario)
+            WHERE (r.origen IN ($placeholdersOrigen) OR r.origen = 'CIERRE')
+            AND (r.usuario IN ($placeholdersUsuario) OR r.origen = 'CIERRE')
         ";
     
         $stmt = $this->GetConn()->prepare($sql);
@@ -65,7 +65,6 @@ class Model extends ConexionCierre
         exit;
     }
     
-
 
 
     // This function is used to import data from an Excel file into the database
@@ -182,6 +181,8 @@ class Model extends ConexionCierre
     {
         $query = 'DELETE FROM reservas';
         $this->getConn()->query($query);
+        $query = 'DELETE FROM clientes';
+        $this->getConn()->query($query);
     }
 
     public function init()
@@ -216,20 +217,21 @@ class Model extends ConexionCierre
         $clientes = $this->getClientes();
         $reservas = $this->getReservas();
     
-        // Aplicar filtros si hay alguno
-        if(!empty($filtrosOrigen)) {
+        // Aplicar filtros si hay alguno, pero permitir siempre las reservas con origen "CIERRE"
+        if (!empty($filtrosOrigen)) {
             $reservas = array_filter($reservas, function ($reserva) use ($filtrosOrigen) {
-                return in_array($reserva['origen'], $filtrosOrigen);
+                return strtoupper(trim($reserva['origen'])) === 'CIERRE' || in_array($reserva['origen'], $filtrosOrigen);
             });
         }
-    
 
-        // Aplicar el filtro solo si hay alguno seleccionado Y no están todos seleccionados
+        // Aplicar filtro de usuario solo si hay alguno seleccionado Y no están todos seleccionados,
+        // pero permitir siempre las reservas con origen "CIERRE"
         if (!empty($filtrosUsuario) && count($filtrosUsuario) < 6) {
             $reservas = array_filter($reservas, function ($reserva) use ($filtrosUsuario) {
-                return in_array($reserva['usuario'], $filtrosUsuario);
+                return strtoupper(trim($reserva['origen'])) === 'CIERRE' || in_array($reserva['usuario'], $filtrosUsuario);
             });
         }
+
         
     
         // Definir todos los posibles campos
@@ -300,6 +302,11 @@ class Model extends ConexionCierre
                   </td>';
             echo '</tr>';
         }
+        echo '<tr>';
+        echo '<td colspan="' . (count($camposSeleccionados) + 2) . '" style="text-align: center; padding: 20px;">';
+        echo '<a href="nueva_reserva.php" class="bononcheck" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-size: 16px; display: inline-block;">➕ Añadir Reserva</a>';
+        echo '</td>';
+        echo '</tr>';
     
         echo '</tbody></table>';
     }
@@ -308,20 +315,22 @@ class Model extends ConexionCierre
 
     public function showTotales(array $filtrosOrigen = [], array $filtrosUsuario = [])
     {
-        // Obtener todas las reservas
         $reservas = $this->getReservas();
     
         $totalVisa = 0;
         $totalEfectivo = 0;
     
         foreach ($reservas as $reserva) {
-            // Aplicar filtro de origen (si hay)
-            if (!empty($filtrosOrigen) && !in_array($reserva['origen'], $filtrosOrigen)) {
+            // Siempre incluir origen = 'CIERRE'
+            $esCierre = strtoupper(trim($reserva['origen'])) === 'CIERRE';
+    
+            // Aplicar filtro de origen (si hay), pero permitir CIERRE siempre
+            if (!empty($filtrosOrigen) && !$esCierre && !in_array($reserva['origen'], $filtrosOrigen)) {
                 continue;
             }
     
-            // Aplicar filtro de usuario solo si hay alguno y hay menos de 6 seleccionados
-            if (!empty($filtrosUsuario) && count($filtrosUsuario) < 6 && !in_array($reserva['usuario'], $filtrosUsuario)) {
+            // Aplicar filtro de usuario solo si hay y hay menos de 6 seleccionados, pero permitir CIERRE siempre
+            if (!empty($filtrosUsuario) && count($filtrosUsuario) < 6 && !$esCierre && !in_array($reserva['usuario'], $filtrosUsuario)) {
                 continue;
             }
     
@@ -337,6 +346,7 @@ class Model extends ConexionCierre
         </div>
         ';
     }
+    
     
     
     
@@ -414,8 +424,54 @@ class Model extends ConexionCierre
         $stmt = $this->getConn()->prepare("SELECT * FROM clientes WHERE id_cliente = ?");
         $stmt->execute([$id]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result;
-    }
+        return $result;}
+        
+
+        public function crearCliente($idCliente, $nombre, $apellido1, $apellido2, $telefono, $email) {
+            try {
+                $sql = "INSERT INTO clientes (id_cliente, nombre, apellido1, apellido2, telefono, email)
+                        VALUES (:id_cliente, :nombre, :apellido1, :apellido2, :telefono, :email)";
+                $stmt = $this->getConn()->prepare($sql);
+                $stmt->execute([
+                    'id_cliente' => $idCliente,
+                    ':nombre' => $nombre,
+                    ':apellido1' => $apellido1,
+                    ':apellido2' => $apellido2,
+                    ':telefono' => $telefono,
+                    ':email' => $email,
+                ]);
+            } catch (PDOException $e) {
+                die("Error al insertar cliente: " . $e->getMessage());
+            }
+        }
+        
+    
+    
+        public function crearReserva($idCliente, $idReserva, $origen,  $comentario, $comentario_interno, $importe, $visa, $efectivo) {
+            try {
+
+
+                $sql = "INSERT INTO reservas (id_reserva, id_cliente, origen, comentario, comentario_interno, importe, visa, efectivo)
+                VALUES (:id_reserva, :id_cliente, :origen, :comentario, :comentario_interno, :importe, :visa, :efectivo)";
+        
+        $stmt = $this->getConn()->prepare($sql);
+        $stmt->execute([
+            ':id_reserva' => $idReserva,
+            ':id_cliente' => $idCliente,
+            ':origen' => $origen,
+            ':comentario' => $comentario,
+            ':comentario_interno' => $comentario_interno,
+            ':importe' => $importe,
+            ':visa' => $visa,
+            ':efectivo' => $efectivo,
+        ]);
+            } catch (PDOException $e) {
+                die("Error al insertar reserva: " . $e->getMessage());
+            }
+        }
+        
+        
+    
 
     public function actualizarReserva($id, $importe, $visa, $efectivo)
     {

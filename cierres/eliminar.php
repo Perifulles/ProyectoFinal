@@ -9,14 +9,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_reserva'])) {
     try {
         $Manager->eliminarReserva($id);
         $Manager->eliminarCliente($id);
-        // Redirige de vuelta a cierre con el parámetro 'desde=modificar' para mostrar todo
-        header("cierre.php?desde=modificar#tablaCierre");
+        // Establece una variable de sesión para indicar que se debe desplazar a #tablaCierre
+        $_SESSION['scroll_to'] = 'tablaCierre';
+        // Redirige de vuelta a cierre con el parámetro 'desde=modificar'
+        header("Location: ./cierre.php?desde=modificar");
         exit;
     } catch (Exception $e) {
         echo "Error al eliminar la reserva: " . $e->getMessage();
     }
 } else {
-    header("Location: cierre.php#tablaCierre");
+    // Redirige de vuelta a cierre si no se proporciona un ID válido
+    header("Location: ./cierre.php?desde=modificar");
     exit;
 }
 

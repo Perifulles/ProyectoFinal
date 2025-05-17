@@ -3,23 +3,7 @@ session_start(); // Asegúrate de iniciar la sesión al principio del archivo
 require_once __DIR__ . '/vendor/autoload.php';
 require 'autoloader.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_reserva'])) {
-    $id = intval($_POST['id_reserva']);
-    $Manager = new Model();
-    $reserva = $Manager->getReservaPorId($id);
-    $cliente = $Manager->getClientePorId($id);
 
-    if (!$reserva) {
-        echo "<p>Error: No se encontró la reserva.</p>";
-        exit;
-    }
-} else {
-    echo "<p>Error: No se ha proporcionado un ID de reserva válido.</p>";
-    exit;
-}
-
-// Establece la variable de sesión para desplazarse a #tablaCierre al volver
-$_SESSION['scroll_to'] = 'tablaCierre';
 ?>
 
 <html>
@@ -122,9 +106,12 @@ $_SESSION['scroll_to'] = 'tablaCierre';
     </style>
 </head>
 <body>
-    <form method="POST" action="guardar_modificacion.php" class="formulario-edicion">
-        <h2>Modificar Reserva #<?= htmlspecialchars($id ?? '') ?></h2>
+    <form method="POST" action="crear_reserva.php" class="formulario-edicion">
+        <h2>Crear reserva<?= htmlspecialchars($id ?? '') ?></h2>
         <input type="hidden" name="id_reserva" value="<?= htmlspecialchars($id ?? '') ?>">
+
+        <label>ID Cliente:</label>
+        <input type="text" name="id_cliente" value="<?= htmlspecialchars($cliente['id_cliente'] ?? rand(1,60000)) ?>">
 
         <label>Nombre:</label>
         <input type="text" name="nombre" value="<?= htmlspecialchars($cliente['nombre'] ?? '') ?>">
@@ -151,10 +138,10 @@ $_SESSION['scroll_to'] = 'tablaCierre';
         <input type="text" name="importe" value="<?= htmlspecialchars($reserva['importe'] ?? '') ?>">
 
         <label>Visa:</label>
-        <input type="text" name="visa" value="<?= htmlspecialchars($reserva['visa'] ?? '') ?>">
+        <input type="text" name="visa" value="<?= htmlspecialchars($reserva['visa'] ?? 0) ?>">
 
         <label>Efectivo:</label>
-        <input type="text" name="efectivo" value="<?= htmlspecialchars($reserva['efectivo'] ?? '') ?>">
+        <input type="text" name="efectivo" value="<?= htmlspecialchars($reserva['efectivo'] ?? 0) ?>">
 
         <input type="submit" value="Guardar Cambios">
     </form>

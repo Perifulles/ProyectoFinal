@@ -6,7 +6,15 @@ require_once __DIR__ . '/classes/Model.php';  // Carga manual de la clase Model
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
-// --- INICIO DE LÓGICA UNIFICADA ---
+// Verifica si se debe desplazar a #tablaCierre
+if (isset($_SESSION['scroll_to']) && $_SESSION['scroll_to'] === 'tablaCierre') {
+    echo "<script>
+        document.addEventListener('DOMContentLoaded', function() {
+            window.location.hash = '#tablaCierre';
+        });
+    </script>";
+    unset($_SESSION['scroll_to']); // Limpia la variable de sesión
+}
 
 // Instanciar el Manager al principio, ya que se usa en varias partes
 $Manager = new Model(); // Asumiendo que tu clase se llama Model
@@ -39,7 +47,7 @@ $campos = [
 
 $porDefecto = [
     'id_reserva', 'producto', 'nombre', 'apellido1', 'apellido2',
-    'telefono', 'comentario', 'estado', 'importe', 'visa', 'efectivo'
+    'telefono', 'comentario', 'comentario_interno', 'estado', 'importe', 'visa', 'efectivo'
 ];
 
 // Opciones disponibles
