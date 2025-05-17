@@ -10,13 +10,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_reserva'])) {
         $Manager->eliminarReserva($id);
         $Manager->eliminarCliente($id);
         // Redirige de vuelta a cierre con el parámetro 'desde=modificar' para mostrar todo
-        header("Location: cierre.php?desde=modificar");
+        header("cierre.php?desde=modificar#tablaCierre");
         exit;
     } catch (Exception $e) {
         echo "Error al eliminar la reserva: " . $e->getMessage();
     }
 } else {
-    header("Location: cierre.php");
+    header("Location: cierre.php#tablaCierre");
     exit;
 }
 

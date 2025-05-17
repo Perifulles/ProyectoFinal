@@ -3,7 +3,7 @@
 require 'vendor/autoload.php';
 
 function autocargador($clase) {
-    $archivo = 'clases/' . $clase . '.php';
+    $archivo = 'classes/' . $clase . '.php';
     if (file_exists($archivo)) {
         require_once $archivo;
     } else {

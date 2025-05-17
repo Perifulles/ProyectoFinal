@@ -24,16 +24,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_reserva'])) {
     <title>Modificar Reserva</title>
     <link rel="stylesheet" type="text/css" href="../styles.css">
     <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f4f4f9;
-            margin: 0;
-            padding: 0;
             display: flex;
             justify-content: center;
-            align-items: center;
-            height: 100vh;
+            align-items: flex-start;
+            padding: 40px 0;
+            overflow: auto;
         }
+
 
         .formulario-edicion {
             background: #ffffff;
@@ -52,6 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_reserva'])) {
         .formulario-edicion label {
             display: block;
             margin-bottom: 8px;
+            margin-top: 10px;;
             font-weight: bold;
             color: #555;
         }
@@ -130,6 +137,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_reserva'])) {
         <label>Email:</label>
         <input type="email" name="email" value="<?= htmlspecialchars($cliente['email'] ?? '') ?>">
 
+        <label>Comentario:</label>
+        <input type="text" name="comentario" value="<?= htmlspecialchars($reserva['comentario'] ?? '') ?>">
+
+        <label>Comentario interno</label>
+        <input type="text" name="comentario_interno" value="<?= htmlspecialchars($reserva['comentario_interno'] ?? '') ?>">
+
         <label>Importe:</label>
         <input type="text" name="importe" value="<?= htmlspecialchars($reserva['importe'] ?? '') ?>">
 
@@ -142,6 +155,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_reserva'])) {
         <input type="submit" value="Guardar Cambios">
     </form>
 
-    <a href="cierre.php" class="boton-anadir-pasante">🔙 Volver</a>
+<a href="cierre.php?desde=modificar#tablaCierre" class="boton-anadir-pasante">🔙 Volver</a>
+
+
 </body>
 </html>

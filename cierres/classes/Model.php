@@ -258,7 +258,7 @@ class Model extends ConexionCierre
             'efectivo' => 'Efectivo'
         ];
     
-        echo '<table class="greenTable">';
+        echo '<table class="greenTable" id="tablaCierre">';
         echo '<thead><tr>';
         foreach ($todosCampos as $campo => $etiqueta) {
             if (in_array($campo, $camposSeleccionados)) {

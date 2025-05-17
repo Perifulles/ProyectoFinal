@@ -166,7 +166,7 @@ if (isset($_SESSION['mensaje_backup'])) {
 ?>
 <button onclick="toggleFiltros()" type="button" class="boton-anadir-pasante" style="background-color: #FFD700; display: block;">🎚️ Mostrar/Ocultar Filtros</button>
 <div id="filtrosContainer" style="margin-top: 20px; display: none;">
-    <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" style="margin-bottom: 20px;">
+    <form method="POST" action="cierre.php#tablaCierre" style="margin-bottom: 20px;">
     <fieldset>
     <legend style="font-weight: bold; font-size: x-large;">Selecciona los filtros:</legend>
     <br>
@@ -214,6 +214,7 @@ if (isset($_SESSION['mensaje_backup'])) {
             <legend style="font-weight: bold; font-size:x-large">Selecciona los campos que deseas mostrar en el cierre:</legend>
             <button type="button" onclick="seleccionarTodos()" class="botonform"><b>Seleccionar Todos</b></button>
             <button type="button" onclick="deseleccionarTodos()" class="botonform" style="width:250px;"><b>No seleccionar ninguno</b></button>
+            <button type="button" onclick="seleccionarPredeterminados()" class="botonform" style="width:250px;"><b>Predeterminados</b></button>
             <div class="checkbox-group">
                 <?php
                 // Usar $camposSeleccionados determinado en la lógica unificada para marcar checkboxes
@@ -240,6 +241,14 @@ if (isset($_SESSION['mensaje_backup'])) {
 
     function deseleccionarTodos() {
         document.querySelectorAll("input[type='checkbox'][name='campos[]']").forEach(cb => cb.checked = false);
+    }
+
+    const camposPorDefecto = <?php echo json_encode($porDefecto); ?>;
+
+    function seleccionarPredeterminados() {
+        document.querySelectorAll("input[type='checkbox'][name='campos[]']").forEach(cb => {
+            cb.checked = camposPorDefecto.includes(cb.value);
+        });
     }
 
     function toggleCampos() {
