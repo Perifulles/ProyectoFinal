@@ -13,6 +13,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $importe = $_POST['importe'] ?? '';
     $visa = floatval($_POST['visa'] ?? 0);
     $efectivo = floatval($_POST['efectivo'] ?? 0);
+    $coment = $_POST['comentario'] ?? '';
+    $comentint = $_POST['comentario_interno'] ?? '';
 
     $Manager = new Model();
 
@@ -20,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $Manager->actualizarCliente($id, $nombre, $apellido1, $apellido2, $telefono, $email);
 
     // Actualiza la tabla reservas
-    $Manager->actualizarReserva($id, $importe, $visa, $efectivo);
+    $Manager->actualizarReserva($id, $coment, $comentint, $importe, $visa, $efectivo);
 
     // Redirige de nuevo a la lista
     header("Location: cierre.php?desde=modificar");

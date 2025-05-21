@@ -473,11 +473,11 @@ class Model extends ConexionCierre
         
     
 
-    public function actualizarReserva($id, $importe, $visa, $efectivo)
+    public function actualizarReserva($id, $comentario, $comentario_interno, $importe, $visa, $efectivo)
     {
-    $sql = "UPDATE reservas SET importe = ?, visa = ?, efectivo = ? WHERE id_reserva = ?";
+    $sql = "UPDATE reservas SET importe = ?, comentario = ?, comentario_interno = ?, visa = ?, efectivo = ? WHERE id_reserva = ?";
     $stmt = $this->getConn()->prepare($sql);
-    return $stmt->execute([$importe, $visa, $efectivo, $id]);
+    return $stmt->execute([$importe, $comentario, $comentario_interno, $visa, $efectivo, $id]);
         }
 
     public function actualizarCliente($id, $nombre, $apellido1, $apellido2, $telefono, $email)
